@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title" id="name">Name</h1>
+        <div class="content" id="msgbox">
+        </div>
+        <div class="message">
+            <input type="hidden" value={{count}} id="count">
+            <textarea class="messageinput" id="msgarea"></textarea>
+            <img src="/static/send.png" onclick="sendmsg()" class="send">
+        </div>
+    </div>
+    <!-- <script src="/static/script.js"></script> -->
+    <script>
+        let msgbox = document.getElementById("msgbox");
+        let msgarea = document.getElementById("msgarea");
+        let disname = document.getElementById("name");
+        let count = document.getElementById("count");
+
+        let name = prompt("enter your name");
+        $.get(`/sendmsg/{{count}}/${name}`);
+        disname.innerHTML = name;
+
+        function sendmsg(){
+            if(msgarea.value != "" || 1==1){
+                $.get(`/sendmsg/${count.value}/${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`);
+                let send = document.createElement("div");
+                send.innerHTML = `${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`;
+                send.className = "msg sendmsg";
+                msgbox.appendChild(send);
+                msgarea.value = "";
+            }
+        }
+
+        let recivecall = ()=>{
+            fetch(`/msg/${count.value}`).then(response =>{
+                response.json().then((data)=>{
+                    let recive = document.createElement("div");
+                    if(data.msg != ""){
+                        recive.innerHTML = data.msg;
+                        recive.className = "msg recivemsg";
+                        msgbox.appendChild(recive);
+                    }
+                    setTimeout(recivecall(), 500);
+                })
+            })
+        };
+
+        setTimeout(recivecall(), 500);
+
+        window.addEventListener("beforeunload",()=>{
+            $.get(`/sendmsg/{{count}}/exit`);
+        })
+
+    </script>
+</body>
+</html>

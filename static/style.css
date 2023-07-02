@@ -1,0 +1,74 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+.container{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.title{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
+    border-bottom: 2px solid #ffffff;
+}
+.content{
+    height: calc(100% - 7rem);
+    overflow-y: scroll;
+}
+.message{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 4rem;
+    background-color: #ffffff;
+}
+.messageinput{
+    height: 80%;
+    width: 80%;
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 5px 10px;
+    resize: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    font-size: 1.5rem;
+}
+.messageinput::-webkit-scrollbar{
+    display: none;
+}
+.send{
+    width: 2rem;
+    height: 2rem;
+    color: black;
+    cursor: pointer;
+}
+.msg{
+    position: relative;
+    background-color: #ffffff;
+    padding: 10px;
+    border: 2px solid;
+    width: fit-content;
+    max-width: 50%;
+    border-radius: 10px;
+    font-size: 1.5rem;
+}
+.recivemsg{
+    left: 10px;
+}
+.sendmsg{
+    left: 100%;
+    transform: translateX(calc(-100% - 10px));
+}
+.sendername{
+    color: blue;
+    font-size: 1rem;
+}
