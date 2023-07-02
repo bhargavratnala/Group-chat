@@ -2,14 +2,14 @@ import socket
 import threading
 import subprocess
 
-out = subprocess.getoutput("ipconfig").split("\n")
-for i in out:
-    if(i.strip().startswith("IPv4")):
-        out = i
-        break
+# out = subprocess.getoutput("ipconfig").split("\n")
+# for i in out:
+#     if(i.strip().startswith("IPv4")):
+#         out = i
+#         break
 
-# HOST = "127.0.0.1"  # localhost
-HOST = out.split()[-1]    # ip address of pc
+HOST = "127.0.0.1"  # localhost
+# HOST = out.split()[-1]    # ip address of pc
 PORT = 9090
 clients = []
 
