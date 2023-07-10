@@ -26,15 +26,17 @@ PORT = 9090
 @app.route("/chat")
 def home():
     global sock, count
-    exit = False
 
-    sock[count] = Sock(socket.socket(socket.AF_INET, socket.SOCK_STREAM), count)
-    sock[count].sock.connect((HOST, PORT))
-    count += 1
-    print("connected")
+    try:
+        sock[count] = Sock(socket.socket(socket.AF_INET, socket.SOCK_STREAM), count)
+        sock[count].sock.connect((HOST, PORT))
+        count += 1
+        print("connected")
 
-    print(sock)
-    return flask.render_template("./client.html", count = count-1)
+        print(sock)
+        return flask.render_template("./client.html", count = count-1)
+    except:
+        return flask.render_template("./ConnectFail.html")
 
 @app.route("/msg/<count>")
 def recive(count):
