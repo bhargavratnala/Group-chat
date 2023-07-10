@@ -2,23 +2,23 @@ import socket
 import threading
 import subprocess
 
-out = subprocess.getoutput("ipconfig").split("\n")
-for i in out:
-    if(i.strip().startswith("IPv4")):
-        out = i
-        break
+# out = subprocess.getoutput("ipconfig").split("\n")
+# for i in out:
+#     if(i.strip().startswith("IPv4")):
+#         out = i
+#         break
 
-# HOST = "127.0.0.1"  # localhost
-HOST = out.split()[-1]    # ip address of pc
+HOST = "127.0.0.1"  # localhost
+# HOST = out.split()[-1]    # ip address of pc
 PORT = 9090
 clients = []
 
 class Client:
 
-    def __init__(self, client) -> None:
+    def __init__(self, client, name = "") -> None:
         self.client = client[0]
         self.address = client[1]
-        self.name = None
+        self.name = name
     
     def set_name(self, name):
         self.name = name
@@ -29,12 +29,12 @@ sock.bind((HOST, PORT))
 sock.listen()
 print("listening...")
 
-def broadcast(msg, client):
+def broadcast(msg, client = None):
     for i in clients:
         if(i == client):
             continue
         print("message sent to :", i.name)
-        i.client.send(f"<span class=\"sendername\">{client.name}</span><br>{msg}".encode("utf-8"))
+        i.client.send(f"<div class=\"msg{' recivemsg' if client!=None else ' servermsg'}\"><span class=\"sendername\">{client.name if client!=None else 'server '}</span>{'<br>' if client!=None else ''}<span>{msg}</span></div>".encode("utf-8"))
 
 def handle(client : Client):
     while True:
@@ -42,9 +42,10 @@ def handle(client : Client):
             print(client.name, "checking for message")
             msg = client.client.recv(2048).decode()
             print(client.name, "recived")
-            if(msg == "exit"):
+            if(msg == "9989eXiT7981@closeTHEuser"):
                 print(f"{client.name} leaving...")
                 clients.remove(client)
+                broadcast(f"{client.name} leaving...")
                 break
             print("broadcast iniated by :", client.name)
             broadcast(msg, client)
@@ -60,7 +61,7 @@ while True:
 
         print(name, "connected..")
 
-        client.client.send("Connected...".encode())
+        client.client.send("<div class=\"msg recivemag\">Connected...".encode("utf-8"))
 
         thread = threading.Thread(target= handle, args=(client,))
         thread.start()

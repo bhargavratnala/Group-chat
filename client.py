@@ -1,5 +1,5 @@
 import socket
-import threading
+# import threading
 import subprocess
 import flask
 
@@ -12,14 +12,14 @@ class Sock:
 app = flask.Flask(__name__, template_folder='template', static_folder='static')
 sock = {}
 count = 0
-out = subprocess.getoutput("ipconfig").split("\n")
-for i in out:
-    if(i.strip().startswith("IPv4")):
-        out = i
-        break
+# out = subprocess.getoutput("ipconfig").split("\n")
+# for i in out:
+#     if(i.strip().startswith("IPv4")):
+#         out = i
+#         break
 
-# HOST = "127.0.0.1"  # localhost
-HOST = out.split()[-1]    # ip address of pc
+HOST = "127.0.0.1"  # localhost
+# HOST = out.split()[-1]    # ip address of pc
 PORT = 9090
 
 @app.route("/")
@@ -54,4 +54,4 @@ def send(msg, count):
     return msg
 
 if __name__ == "__main__":
-    app.run(host=HOST, port=9999, debug=True)
+    app.run(host="0.0.0.0", port=9999, debug=True)

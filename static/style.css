@@ -64,6 +64,17 @@ body{
 .recivemsg{
     left: 10px;
 }
+.servermsg{
+    left: 50%;
+    padding: 5px;
+    transform: translateX(-50%);
+}
+.servermsg span{
+    font-size: 1rem !important;
+}
+.servermsg .sendername{
+    color: red;
+}
 .sendmsg{
     left: 100%;
     transform: translateX(calc(-100% - 10px));

@@ -36,6 +36,7 @@
                 send.innerHTML = `${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`;
                 send.className = "msg sendmsg";
                 msgbox.appendChild(send);
+                msgbox.scrollTop = msgbox.scrollHeight;
                 msgarea.value = "";
             }
         }
@@ -43,11 +44,9 @@
         let recivecall = ()=>{
             fetch(`/msg/${count.value}`).then(response =>{
                 response.json().then((data)=>{
-                    let recive = document.createElement("div");
                     if(data.msg != ""){
-                        recive.innerHTML = data.msg;
-                        recive.className = "msg recivemsg";
-                        msgbox.appendChild(recive);
+                        msgbox.innerHTML = msgbox.innerHTML + data.msg;
+                        msgbox.scrollTop = msgbox.scrollHeight;
                     }
                     setTimeout(recivecall(), 500);
                 })
@@ -57,7 +56,7 @@
         setTimeout(recivecall(), 500);
 
         window.addEventListener("beforeunload",()=>{
-            $.get(`/sendmsg/{{count}}/exit`);
+            $.get(`/sendmsg/{{count}}/9989eXiT7981@closeTHEuser`);
         })
 
     </script>
