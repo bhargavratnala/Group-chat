@@ -11,6 +11,7 @@
     <div class="container">
         <h1 class="title" id="name">Name</h1>
         <div class="content" id="msgbox">
+            <div class="msg servermsg"><span class="sendername">server</span> joined in {{room}} room</div>
         </div>
         <div class="message">
             <input type="hidden" value={{count}} id="count">
@@ -22,16 +23,10 @@
     <script>
         let msgbox = document.getElementById("msgbox");
         let msgarea = document.getElementById("msgarea");
-        let disname = document.getElementById("name");
-        let count = document.getElementById("count");
-
-        let name = prompt("enter your name");
-        $.get(`/sendmsg/{{count}}/${name}`);
-        disname.innerHTML = name;
 
         function sendmsg(){
-            if(msgarea.value != "" || 1==1){
-                $.get(`/sendmsg/${count.value}/${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`);
+            if(msgarea.value != ""){
+                $.get(`/sendmsg/{{count}}/${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`);
                 let send = document.createElement("div");
                 send.innerHTML = `${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`;
                 send.className = "msg sendmsg";
@@ -42,7 +37,7 @@
         }
 
         let recivecall = ()=>{
-            fetch(`/msg/${count.value}`).then(response =>{
+            fetch(`/msg/{{count}}`).then(response =>{
                 response.json().then((data)=>{
                     if(data.msg != ""){
                         msgbox.innerHTML = msgbox.innerHTML + data.msg;

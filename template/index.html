@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Chat</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body id="htmlbody">
+    <div class="nav">
+        <h2 class="nav-title">Web Chat Application</h2>
+        <div class="themebutton" id="themebutton">
+            <div class="sun" id="sun">
+            </div>
+            <span style="--rotate: 0;" class="sunline"></span>
+            <span style="--rotate: 1;" class="sunline"></span>
+            <span style="--rotate: 2;" class="sunline"></span>
+            <span style="--rotate: 3;" class="sunline"></span>
+            <span style="--rotate: 4;" class="sunline"></span>
+            <span style="--rotate: 5;" class="sunline"></span>
+            <span style="--rotate: 6;" class="sunline"></span>
+            <span style="--rotate: 7;" class="sunline"></span>
+            <span style="--rotate: 8;" class="sunline"></span>
+        </div>
+    </div>
+    <div class="mainbody">
+        <div class="messangerApplication" id="messageApplication">
+            <div class="chattitle">
+                <h3 class="namebox" id="name">Name</h3>
+                <h3 class="roomcode" id="roomcode">Room Code: ####</h3>
+            </div>
+            <div class="chatbox" id="msgbox">
+            </div>
+            <div class="messagesender">
+                <textarea placeholder="Type your message..." class="msginput" id="messagearea"></textarea>
+                <button class="sendinput" onclick="sendmsg()">SEND</button>
+            </div>
+        </div>
+        <div class="container">
+            <span class="head">Group Chat</span>
+            <input type="button" class="roombutton" value="Create Room" onclick="createRoom()">
+            <input type="button" class="roombutton" value="Enter Existing Room" onclick="closeopen(`entryboxroom`)">
+        </div>
+        <div class="entrybox" id="entryboxname">
+            <div class="container">
+                <h2 id="title">Enter Name</h2>
+                <input type="text" class="input-box" id="inputname">
+                <div>
+                    <button onclick="submitName()" class="button">Submit</button>
+                </div>
+                <p id="errormsg"></p>
+            </div>
+        </div>
+        <div class="entrybox close" id="entryboxroom">
+            <div class="container">
+                <h2 id="title">Enter Room No</h2>
+                <input type="number" class="input-box" id="inputroom">
+                <div>
+                    <button onclick="sendroom()" class="button">Submit</button>
+                </div>
+                <p id="roomerrormsg"></p>
+            </div>
+            <input type="hidden" value={{count}} id="count">
+        </div>
+    </div>
+    <script>
+        let theme = document.getElementById("themebutton");
+        let inputname = document.getElementById("inputname");
+        let inputroom = document.getElementById("inputroom");
+        let name = document.getElementById("name");
+        let messageApplication = document.getElementById("messageApplication");
+        let roomcode = document.getElementById("roomcode");
+        let roomerror = document.getElementById("roomerrormsg");
+        let msgarea = document.getElementById("messagearea");
+        let msgbox = document.getElementById("msgbox");
+
+        theme.addEventListener("click", ()=>{
+            let sun = document.getElementById("sun");
+            let htmlbody = document.getElementById("htmlbody");
+            htmlbody.classList.toggle("secondarycolor");
+            sun.classList.toggle("moon");
+        })
+
+        function closeopen(id){
+            let entrybox = document.getElementById(id);
+            entrybox.classList.toggle("close");
+        }
+
+        function submitName(){
+            if(inputname.value != ""){
+                $.get(`/setname/{{count}}/${inputname.value}`);
+                name.innerHTML = inputname.value;
+                closeopen(`entryboxname`);
+            }
+        }
+
+        function createRoom(){
+            fetch(`/createRoom/{{count}}`).then(response =>{
+                response.json().then(data => {
+                    let room = data.msg;
+                    messageApplication.classList.add("msgApp");
+                    roomcode.innerHTML = `Room Code: ${room}`;
+                    recivecall();
+                })
+            })
+        }
+
+        function sendroom(){
+            if(inputroom.value == "" || inputroom.value.length > 4){
+                roomerror.innerHTML = "Enter valid <b>Room No<b>!";
+            }
+            else{
+                fetch(`/EnterExistingRoom/{{count}}/${inputroom.value}`).then(response =>{
+                    response.json().then(data =>{
+                        let room = data.msg;
+                        if(room == 'false'){
+                            roomerror.innerHTML = "Room doesn't exist.";
+                        }
+                        else{
+                            closeopen(`entryboxroom`);
+                            messageApplication.classList.add("msgApp");
+                            roomcode.innerHTML = `Room Code: ${room}`;
+                            recivecall();
+                        }
+                    })
+                })
+            }
+        }
+
+        function sendmsg(){
+            if(msgarea.value != "" || 1==1){
+                $.get(`/sendmsg/${count.value}/${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`);
+                let send = document.createElement("div");
+                send.innerHTML = `${msgarea.value.replace(/\r\n|\r|\n/g, "<br>")}`;
+                send.className = "msg sendmsg";
+                msgbox.appendChild(send);
+                msgbox.scrollTop = msgbox.scrollHeight;
+                msgarea.value = "";
+            }
+        }
+
+        let recivecall = ()=>{
+            fetch(`/msg/${count.value}`).then(response =>{
+                response.json().then((data)=>{
+                    if(data.msg != ""){
+                        msgbox.innerHTML = msgbox.innerHTML + data.msg;
+                        msgbox.scrollTop = msgbox.scrollHeight;
+                    }
+                    setTimeout(recivecall(), 500);
+                })
+            })
+        };
+
+        window.addEventListener("beforeunload",()=>{
+            $.get(`/sendmsg/{{count}}/9989eXiT7981@closeTHEuser`);
+        });
+    </script>
+</body>
+</html>

@@ -8,35 +8,60 @@ class Sock:
     def __init__(self, sock, count) -> None:
         self.sock = sock
         self.count = count
+        self.name = None
+        self.room = None
+    
+    def set_room(self, room):
+        self.room = room
+    
+    def set_name(self, name):
+        self.name = name
 
 app = flask.Flask(__name__, template_folder='template', static_folder='static')
 sock = {}
 count = 0
-# out = subprocess.getoutput("ipconfig").split("\n")
-# for i in out:
-#     if(i.strip().startswith("IPv4")):
-#         out = i
-#         break
 
 HOST = "127.0.0.1"  # localhost
-# HOST = out.split()[-1]    # ip address of pc
 PORT = 9090
 
 @app.route("/")
-@app.route("/chat")
-def home():
-    global sock, count
-
+def index():
+    global count, sock
     try:
         sock[count] = Sock(socket.socket(socket.AF_INET, socket.SOCK_STREAM), count)
         sock[count].sock.connect((HOST, PORT))
         count += 1
         print("connected")
-
-        print(sock)
-        return flask.render_template("./client.html", count = count-1)
-    except:
+        return flask.render_template("./index.html", count = count-1)
+    except Exception as e:
+        print(e)
         return flask.render_template("./ConnectFail.html")
+
+@app.route("/setname/<count>/<name>")
+def setname(count, name):
+    global sock
+    count = int(count)
+    sock[count].set_name(name)
+    sock[count].sock.send(name.encode())
+    return flask.jsonify({})
+
+@app.route("/createRoom/<count>")
+def createRoom(count):
+    global sock
+    count = int(count)
+    sock[count].sock.send("CreAteROoM@798199899".encode())
+    room = sock[count].sock.recv(1024).decode()
+    sock[count].set_room(room)
+    return flask.jsonify({"msg" : room})
+
+@app.route("/EnterExistingRoom/<count>/<room>")
+def EnterExistingRoom(count, room):
+    global sock
+    count = int(count)
+    sock[count].sock.send(f"{room}".encode())
+    room = sock[count].sock.recv(1024).decode()
+    sock[count].set_room(room)
+    return flask.jsonify({"msg" : room})
 
 @app.route("/msg/<count>")
 def recive(count):
@@ -51,9 +76,9 @@ def recive(count):
 @app.route("/sendmsg/<count>/<msg>")
 def send(msg, count):
     global sock
-    print("message is :", msg)
-    sock[int(count)].sock.send(msg.encode())
-    return msg
+    count = int(count)
+    sock[count].sock.send(f"{msg} {sock[count].room}".encode())
+    return flask.jsonify({"msg" : msg})
 
 if __name__ == "__main__":
     app.run(host="", port=9999, debug=True)

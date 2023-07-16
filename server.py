@@ -1,17 +1,13 @@
+import random
 import socket
 import threading
-import subprocess
 
-# out = subprocess.getoutput("ipconfig").split("\n")
-# for i in out:
-#     if(i.strip().startswith("IPv4")):
-#         out = i
-#         break
+def room_key_generate():
+    return random.randint(1000, 9999)
 
 HOST = "127.0.0.1"  # localhost
-# HOST = out.split()[-1]    # ip address of pc
 PORT = 9090
-clients = []
+clients = {}
 
 class Client:
 
@@ -29,8 +25,8 @@ sock.bind((HOST, PORT))
 sock.listen()
 print("listening...")
 
-def broadcast(msg, client = None):
-    for i in clients:
+def broadcast(msg, room, client = None):
+    for i in clients[room]:
         if(i == client):
             continue
         print("message sent to :", i.name)
@@ -41,30 +37,51 @@ def handle(client : Client):
         try:
             print(client.name, "checking for message")
             msg = client.client.recv(2048).decode()
+            room = int(msg[-4:])
+            msg = msg[:-5]
             print(client.name, "recived")
             if(msg == "9989eXiT7981@closeTHEuser"):
                 print(f"{client.name} leaving...")
-                clients.remove(client)
-                broadcast(f"{client.name} leaving...")
+                clients[room].remove(client)
+                broadcast(f"{client.name} leaving...", room)
+                if(clients[room] == []):
+                    print("deleting room", room)
+                    del clients[room]
                 break
             print("broadcast iniated by :", client.name)
-            broadcast(msg, client)
-        except:
-            print("error occured in handle", client.name)
+            broadcast(msg, room, client)
+        except Exception as e:
+            print("error occured in handle", e, client.name)
 
 while True:
     try:
         client = Client(sock.accept())
         name = client.client.recv(1024).decode()
         client.set_name(name)
-        clients.append(client)
 
         print(name, "connected..")
 
-        client.client.send("<div class=\"msg recivemag\">Connected...".encode("utf-8"))
+        while True:
+            code = client.client.recv(1024).decode()
+            if(code == "CreAteROoM@798199899"):
+                room = room_key_generate()
+                while(room in clients):
+                    room = room_key_generate()
+                clients[room] = [client]
+            else:
+                if(int(code) in clients):
+                    clients[int(code)].append(client)
+                    room = code
+                else:
+                    room = 'false'
+            client.client.send(f"{room}".encode("utf-8"))
+            if(room!='false'):
+                break
+
+        client.client.send("<div class=\"msg servermsg\">Connected...</div>".encode("utf-8"))
 
         thread = threading.Thread(target= handle, args=(client,))
         thread.start()
         print("thread started..")
-    except:
-        print("error occured in connecting")
+    except Exception as e:
+        print("error occured in connecting", e)
