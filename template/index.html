@@ -100,6 +100,7 @@
                 response.json().then(data => {
                     let room = data.msg;
                     messageApplication.classList.add("msgApp");
+                    document.title = document.title + `(${room})`;
                     roomcode.innerHTML = `Room Code: ${room}`;
                     recivecall();
                 })
@@ -120,6 +121,7 @@
                         else{
                             closeopen(`entryboxroom`);
                             messageApplication.classList.add("msgApp");
+                            document.title = document.title + `(${room})`;
                             roomcode.innerHTML = `Room Code: ${room}`;
                             recivecall();
                         }

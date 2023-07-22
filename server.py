@@ -37,6 +37,7 @@ def handle(client : Client):
         try:
             print(client.name, "checking for message")
             msg = client.client.recv(2048).decode()
+            print(msg, "recived from", client.name)
             room = int(msg[-4:])
             msg = msg[:-5]
             print(client.name, "recived")
