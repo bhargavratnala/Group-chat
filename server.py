@@ -72,14 +72,14 @@ while True:
             else:
                 if(int(code) in clients):
                     clients[int(code)].append(client)
-                    room = code
+                    room = int(code)
                 else:
                     room = 'false'
             client.client.send(f"{room}".encode("utf-8"))
             if(room!='false'):
                 break
 
-        client.client.send("<div class=\"msg servermsg\">Connected...</div>".encode("utf-8"))
+        broadcast(f"{client.name} joined in the room", room)
 
         thread = threading.Thread(target= handle, args=(client,))
         thread.start()
